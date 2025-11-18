@@ -1,86 +1,66 @@
-### [Safe Pass](https://safe-pass-1046763012364.us-central1.run.app/) 
+# Safe Pass
 
+**Safe Pass** is a community-driven safety platform that enables users to submit detailed, location-based reports about incidents like theft, harassment, hazards, and other concerns. All reports are visualized on an interactive map, and users can receive AI-powered safety guidance through an intelligent chatbot assistant.
 
+[**View Live Demo**](https://safe-pass-1046763012364.us-central1.run.app/)
 
-Safe pass enables users to submit detailed, location-based reports about incidents like theft, harassment, hazards, and other concerns. All reports are visualized on an interactive map, and users can receive AI-powered safety guidance through an intelligent chatbot assistant
+## Features
 
+- **Interactive Map Reporting:** Submit detailed safety incident reports by clicking on an interactive map, using current GPS location, or searching for specific addresses.
+- **Street View Verification:** Integrated Google Street View allows users to visually verify locations before reporting or traveling.
+- **Real-time Incident Dashboard:** Visualize community reports on a live, clustered map, filterable by incident type or keywords.
+- **AI Safety Assistant:** A built-in chatbot (powered by Google Gemini) provides personalized safety advice, travel tips, and emergency resources.
+- **Secure Authentication:** Supports both traditional email/password registration and one-click Google Sign-In via Firebase.
 
 ## Project Demo
-Here are some screenshots of the application in action.
-![Login page](images/Login.png)
-![Check Reports](images/Check.png)
-![Report Incident](images/Reportpng)
-![Ai Chat](images/Ai chat.png)
-![Streetview](images/Streetview.png)
 
+Here is a visual walkthrough of the application in action.
 
-### Feature
+### Core Interface
+<div align="center">
+  <img src="images/Login.png" width="45%" alt="Login Page"/>
+  <img src="images/Check.png" width="45%" alt="Check Reports"/>
+</div>
 
+### Reporting & AI Features
+<div align="center">
+  <img src="images/Report.png" width="45%" alt="Report Incident"/>
+  <img src="images/Streetview.png" width="45%" alt="Streetview"/>
+</div>
 
+### AI Assistant
+<div align="center">
+  <img src="images/Ai%20chat.png" width="600px" alt="AI Chat Interface"/>
+</div>
 
-* **Interactive Map Reporting and street view:** Users can submit detailed safety incident reports by clicking on an interactive map, using their current location, or searching for an address and use street view to verification the location.
-* **Real-time Incident Dashboard:** All community reports are visualized on a live, clustered map, which can be filtered by incident type or keywords.
-* **AI Safety Assistant:** A built-in chatbot (powered by Google Gemini) provides users with personalized safety advice, travel tips, and emergency contact information.
-* **Secure Authentication:** The platform supports both traditional email/password registration and a one-click Google Sign-In option via Firebase.
+## Technology Stack
 
+This project leverages a modern tech stack to ensure reliability and scalability.
 
+| Component | Technology | Description |
+|-----------|------------|-------------|
+| **Frontend** | HTML5 / CSS3 | Structure and Styling |
+| | Bootstrap | Responsive UI Framework & Components |
+| | JavaScript | Interactive logic & DOM manipulation |
+| | Google Maps API | Interactive mapping, markers, and clustering |
+| **Backend** | Flask | Python Micro-framework for routing |
+| | Jinja2 | Server-side template rendering |
+| | Werkzeug | Password hashing (Scrypt) |
+| **Database** | Firestore | NoSQL document database for reports |
+| | Firebase Auth | User identity and Google Sign-In |
+| **AI & APIs** | Google Gemini | Generative AI for the Safety Chatbot |
+| | Geocoding API | Address resolution and reverse geocoding |
+| | Places API | Location search and autocomplete |
+| **DevOps** | Docker | Containerization |
+| | Google Cloud Run | Serverless hosting environment |
 
+## Installation
 
+To run this project locally, follow these steps:
 
-
-
-### Technology
-
-
-
-**Frontend:**
-
-* HTML5
-* CSS3
-* Bootstrap - UI Framework (grid, components) 
-* JavaScript 
-* Google Maps JS API - Interactive mapping, markers, geocoding 
-* MarkerCluster      -  Map optimization for large data sets 
-* Jinja2             - Server-side template rendering 
-
-
-
-
-
-**Backend:**
-
-* Flask         - Web framework and routing 
-* Flask-Session - Server-side session management 
-* Werkzeug      - Password hashing (Scrypt) 
-* Gunicorn      - Production WSGI server 
-* python-dotenv - Environment variable management
-
-
-
-
-
-**Database \\\& Cloud Services:**
-
-* Google Cloud Firestore  - NoSQL document database for user and report data
-* Firebase Authentication - User identity and Google Sign-In 
-* Firebase Admin SDK      - Secure backend operations 
-
-
-
-
-
-**API's:**
-
-* Google Gemini API    - AI chatbot assistant 
-* Google Maps JS API   - Interactive map display 
-* Google Places API    - Location search and autocomplete 
-* Google Geocoding API - Address resolution (reverse geocoding)
-
-
-
-**Hosting:**
-
-* Google Cloud Run
-
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/Santhosh-G-S/Safe-Pass-Webapplication-Project.git](https://github.com/Santhosh-G-S/Safe-Pass-Webapplication-Project.git)
+cd Safe-Pass-Webapplication-Project
 
 
