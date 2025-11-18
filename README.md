@@ -5,7 +5,13 @@
 Safe pass enables users to submit detailed, location-based reports about incidents like theft, harassment, hazards, and other concerns. All reports are visualized on an interactive map, and users can receive AI-powered safety guidance through an intelligent chatbot assistant
 
 
-
+## Project Demo
+Here are some screenshots of the application in action.
+![Login page](images/Login.png)
+![Check Reports](images/Check.png)
+![Report Incident](images/Reportpng)
+![Ai Chat](images/Ai chat.png)
+![Streetview](images/Streetview.png)
 
 
 ### Feature
