@@ -3,10 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Assuming Bootstrap is provided by a link like this or in layout.html -->
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
-
     <title>Safe Pass | Login</title>
 </head>
 
@@ -87,95 +84,105 @@
         import { getAuth, GoogleAuthProvider, sendPasswordResetEmail, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAKqUq06zpiLJ1r-p63nxjnc-vn0gUAlXk",
-            authDomain: "safe-pass-c9c13.firebaseapp.com",
-            projectId: "safe-pass-c9c13",
-            storageBucket: "safe-pass-c9c13.firebasestorage.app",
-            messagingSenderId: "1046763012364",
-            appId: "1:1046763012364:web:b0a4ef8bbcd3a6c2724929",
-            measurementId: "G-ND1DCMNXEV"
-        };
+        // Fetch Firebase configuration from backend (SECURE METHOD)
+        async function initializeFirebase() {
+            try {
+                // Get Firebase config from your Flask backend endpoint
+                const response = await fetch('/firebase-config');
+                const firebaseConfig = await response.json();
 
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        auth.languageCode = 'en';
-        const provider = new GoogleAuthProvider();
+                // Initialize Firebase with config from backend
+                const app = initializeApp(firebaseConfig);
+                const analytics = getAnalytics(app);
+                const auth = getAuth(app);
+                auth.languageCode = 'en';
+                const provider = new GoogleAuthProvider();
 
-        // Forgot Password Handler
-        const reset = document.getElementById("reset");
-        reset.addEventListener("click", function(event) {
-            event.preventDefault();
-
-            // Get email from the input field with correct ID
-            const email = document.getElementById("floatingInput").value;
-
-            if (!email) {
-                alert("Please enter your email address first");
-                return;
+                // Setup event listeners after Firebase is initialized
+                setupEventListeners(auth, provider);
+            } catch (error) {
+                console.error('Error initializing Firebase:', error);
+                alert('Failed to initialize authentication. Please refresh the page.');
             }
-
-            sendPasswordResetEmail(auth, email)
-                .then(() => {
-                    alert("Password reset email sent! Check your inbox.");
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-
-                    if (errorCode === 'auth/user-not-found') {
-                        alert("No account found with this email address");
-                    } else if (errorCode === 'auth/invalid-email') {
-                        alert("Invalid email address");
-                    } else {
-                        alert("Error: " + errorMessage);
-                    }
-                    console.error("Password reset error:", error);
-                });
-        });
-
-        // Google Login Handler
-        const googleLogin = document.getElementById("google-login-btn");
-        if (googleLogin) {
-            googleLogin.addEventListener("click", async function() {
-                try {
-                    const result = await signInWithPopup(auth, provider);
-                    const user = result.user;
-
-                    // Get the ID token
-                    const idToken = await user.getIdToken();
-
-                    // Send token to Flask backend
-                    const response = await fetch('/firebase-login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ idToken: idToken })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok && data.success) {
-                        // Redirect to check page
-                        window.location.href = data.redirect;
-                    } else {
-                        alert('Login failed: ' + (data.error || 'Unknown error'));
-                    }
-
-                } catch (error) {
-                    console.error('Error during sign in:', error);
-
-                    if (error.code === 'auth/popup-closed-by-user') {
-                        // User closed the popup, no need to show error
-                        return;
-                    }
-
-                    alert('Sign in failed: ' + error.message);
-                }
-            });
         }
+
+        function setupEventListeners(auth, provider) {
+            // Forgot Password Handler
+            const reset = document.getElementById("reset");
+            reset.addEventListener("click", function(event) {
+                event.preventDefault();
+
+                const email = document.getElementById("floatingInput").value;
+
+                if (!email) {
+                    alert("Please enter your email address first");
+                    return;
+                }
+
+                sendPasswordResetEmail(auth, email)
+                    .then(() => {
+                        alert("Password reset email sent! Check your inbox.");
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+
+                        if (errorCode === 'auth/user-not-found') {
+                            alert("No account found with this email address");
+                        } else if (errorCode === 'auth/invalid-email') {
+                            alert("Invalid email address");
+                        } else {
+                            alert("Error: " + errorMessage);
+                        }
+                        console.error("Password reset error:", error);
+                    });
+            });
+
+            // Google Login Handler
+            const googleLogin = document.getElementById("google-login-btn");
+            if (googleLogin) {
+                googleLogin.addEventListener("click", async function() {
+                    try {
+                        const result = await signInWithPopup(auth, provider);
+                        const user = result.user;
+
+                        // Get the ID token
+                        const idToken = await user.getIdToken();
+
+                        // Send token to Flask backend
+                        const response = await fetch('/firebase-login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ idToken: idToken })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok && data.success) {
+                            // Redirect to appropriate page
+                            window.location.href = data.redirect;
+                        } else {
+                            alert('Login failed: ' + (data.error || 'Unknown error'));
+                        }
+
+                    } catch (error) {
+                        console.error('Error during sign in:', error);
+
+                        if (error.code === 'auth/popup-closed-by-user') {
+                           
+                            return;
+                        }
+
+                        alert('Sign in failed: ' + error.message);
+                    }
+                });
+            }
+        }
+
+        // Initialize Firebase when page loads
+        initializeFirebase();
     </script>
 </body>
 </html>
