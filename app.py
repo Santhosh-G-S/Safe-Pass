@@ -48,11 +48,13 @@ else:
 app = Flask(__name__)
 
 # Generate secure secret key
-app.secret_key = os.getenv('SECRET_KEY', os.urandom(24))
+app.secret_key = os.getenv('SECRET_KEY')
+if not app.secret_key:
+    raise ValueError("SECRET_KEY environment variable must be set")
 
 # Configure session to use filesystem (with cachelib)
 app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_TYPE"] = "null"
 app.config["SESSION_FILE_DIR"] = os.path.join(os.getcwd(), "flask_session")
 Session(app)
 
@@ -66,6 +68,17 @@ def after_request(response):
     return response
 
 # ============= FIRESTORE HELPER FUNCTIONS =============
+@app.route('/firebase-config')
+def firebase_config():
+    return jsonify({
+        'apiKey': os.getenv('FIREBASE_API_KEY'),
+        'authDomain': os.getenv('FIREBASE_AUTH_DOMAIN'),
+        'projectId': os.getenv('FIREBASE_PROJECT_ID'),
+        'storageBucket': os.getenv('FIREBASE_STORAGE_BUCKET'),
+        'messagingSenderId': os.getenv('FIREBASE_MESSAGING_SENDER_ID'),
+        'appId': os.getenv('FIREBASE_APP_ID'),
+        'measurementId': os.getenv('FIREBASE_MEASUREMENT_ID')
+    })
 
 
 def get_user_by_email(email):
