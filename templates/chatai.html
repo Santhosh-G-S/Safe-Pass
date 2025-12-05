@@ -2,232 +2,242 @@
 {% block title %}Chat with AI{% endblock %}
 
 {% block body %}
-    <div class="container my-4">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 col-md-10 col-12">
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10 col-12">
 
             <!-- Header Card -->
-                <div class="card shadow-sm border-0 mb-3">
-                    <div class="card-body text-center py-4">
-                        <h3 class="fw-bold mb-2">Safety Assistant AI</h3>
-                        <p class="text-muted mb-0">Share your location and concerns - I'm here to help keep you safe</p>
-                    </div>
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body text-center py-4">
+                    <h3 class="fw-bold mb-2">Safety Assistant AI</h3>
+                    <p class="text-muted mb-0">Share your location and concerns - I'm here to help keep you safe</p>
                 </div>
+            </div>
 
             <!-- Chat Container Card -->
-                <div class="card shadow-sm border-0" style="background: transparent;">
-                    <div class="card-body p-0" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0.375rem;">
+            <div class="card shadow-sm border-0" style="background: transparent;">
+                <div class="card-body p-0" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0.375rem;">
 
                     <!-- Chat Messages Area -->
-                        <div id="chat-container" aria-live="polite" class="p-3" style="height: 500px; overflow-y: auto; background: transparent;">
+                    <div id="chat-container" aria-live="polite" class="p-3" style="height: 500px; overflow-y: auto; background: transparent;">
                         <!-- Welcome message -->
-                            <div class="d-flex mb-3">
-                                <div class="bg-primary text-white rounded-3 p-3 shadow-sm" style="max-width: 75%;">
-                                    <strong class="d-block mb-1">AI Assistant</strong>
-                                    <span>Hello! I'm your safety assistant. Tell me about your location, time, and any safety concerns you have. How can I help you today?</span>
-                                </div>
+                        <div class="d-flex mb-3">
+                            <div class="bg-primary text-white rounded-3 p-3 shadow-sm" style="max-width: 75%;">
+                                <strong class="d-block mb-1">AI Assistant</strong>
+                                <span>Hello! I'm your safety assistant. Tell me about your location, time, and any safety concerns you have. How can I help you today?</span>
                             </div>
                         </div>
+                    </div>
 
                     <!-- Input Area -->
-                        <div class="border-top p-3" style="background: transparent; border-color: rgba(255, 255, 255, 0.2) !important;">
-                            <form id="chat-form">
-                                <div class="input-group">
-                                    <input id="inputLarge" class="form-control form-control-lg" type="text" placeholder="Type your message..." autocomplete="off" style="background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);" required>
-                                    <button type="submit" class="btn btn-primary btn-lg px-4">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
-                                            <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <small class="text-muted d-block mt-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-info-circle me-1" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
-                                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
+                    <div class="border-top p-3" style="background: transparent; border-color: rgba(255, 255, 255, 0.2) !important;">
+                        <form id="chat-form">
+                            <div class="input-group">
+                                <input id="inputLarge" class="form-control form-control-lg" type="text" placeholder="Type your message..." autocomplete="off" style="background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);" required>
+                                <button type="submit" class="btn btn-primary btn-lg px-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-send-fill" viewBox="0 0 16 16">
+                                        <path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471z" />
                                     </svg>
-                                    Press Enter to send • Don't share sensitive personal information
-                                </small>
-                            </form>
-                        </div>
-
+                                </button>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-info-circle me-1" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
+                                    <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0" />
+                                </svg>
+                                Press Enter to send • Don't share sensitive personal information
+                            </small>
+                        </form>
                     </div>
-                </div>
 
+                </div>
             </div>
+
         </div>
     </div>
+</div>
 
-    <style>
+<style>
     /* Custom scrollbar for chat */
-        #chat-container::-webkit-scrollbar {
-            width: 8px;
-        }
+    #chat-container::-webkit-scrollbar {
+        width: 8px;
+    }
 
-        #chat-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
+    #chat-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
 
-        #chat-container::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
+    #chat-container::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+    }
 
-        #chat-container::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
+    #chat-container::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
 
     /* Message animations */
-        .message-appear {
-            animation: slideIn 0.3s ease-out;
+    .message-appear {
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
         }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
+    }
 
     /* Typing indicator */
-        .typing-indicator {
-            display: inline-flex;
-            gap: 4px;
-            padding: 8px 12px;
+    .typing-indicator {
+        display: inline-flex;
+        gap: 4px;
+        padding: 8px 12px;
+    }
+
+    .typing-indicator span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #999;
+        animation: typing 1.4s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-indicator span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+
+        0%,
+        60%,
+        100% {
+            transform: translateY(0);
         }
 
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #999;
-            animation: typing 1.4s infinite;
+        30% {
+            transform: translateY(-10px);
         }
+    }
+</style>
 
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    (function () {
+        const chatBox = document.getElementById("chat-container");
+        const form = document.getElementById("chat-form");
+        const input = document.getElementById("inputLarge");
 
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        // Configure marked.js options
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
 
-        @keyframes typing {
+        function addMessage(sender, text, isTyping = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'd-flex mb-3 message-appear';
 
-            0%,
-            60%,
-            100% {
-                transform: translateY(0);
-            }
-
-            30% {
-                transform: translateY(-10px);
-            }
-        }
-    </style>
-
-    <script>
-        (function() {
-            const chatBox = document.getElementById("chat-container");
-            const form = document.getElementById("chat-form");
-            const input = document.getElementById("inputLarge");
-
-            function addMessage(sender, text, isTyping = false) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = 'd-flex mb-3 message-appear';
-
-                if (sender === 'You') {
-                    messageDiv.classList.add('justify-content-end');
+            if (sender === 'You') {
+                messageDiv.classList.add('justify-content-end');
+                const escapedText = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                messageDiv.innerHTML = `
+                    <div class="bg-primary text-white rounded-3 p-3 shadow-sm" style="max-width: 75%;">
+                        <strong class="d-block mb-1">You</strong>
+                        <span>${escapedText}</span>
+                    </div>
+                `;
+            } else {
+                if (isTyping) {
                     messageDiv.innerHTML = `
-        <div class="bg-primary text-white rounded-3 p-3 shadow-sm" style="max-width: 75%;">
-          <strong class="d-block mb-1">You</strong>
-          <span>${escapeHtml(text)}</span>
-        </div>
-      `;
+                        <div class="rounded-3 p-3 shadow-sm" style="max-width: 75%; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.4);">
+                            <strong class="d-block mb-1 text-primary">AI Assistant</strong>
+                            <div class="typing-indicator"><span></span><span></span><span></span></div>
+                        </div>
+                    `;
                 } else {
+                    // Use marked.js to parse markdown
+                    const htmlContent = marked.parse(text);
                     messageDiv.innerHTML = `
-        <div class="rounded-3 p-3 shadow-sm" style="max-width: 75%; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.4);">
-          <strong class="d-block mb-1 text-primary">AI Assistant</strong>
-          ${isTyping ?
-            '<div class="typing-indicator"><span></span><span></span><span></span></div>' :
-            `<span style="color: #333;">${escapeHtml(text)}</span>`
-          }
-        </div>
-      `;
+                        <div class="rounded-3 p-3 shadow-sm" style="max-width: 75%; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.4);">
+                            <strong class="d-block mb-2 text-primary">AI Assistant</strong>
+                            <div style="color: #333;">${htmlContent}</div>
+                        </div>
+                    `;
                 }
-
-                chatBox.appendChild(messageDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
-                return messageDiv;
             }
 
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return messageDiv;
+        }
 
-            async function sendToBackend(text, typingElement) {
-                try {
-                    const res = await fetch('/chatai', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            user_input: text
-                        })
-                    });
+        async function sendToBackend(text, typingElement) {
+            try {
+                const res = await fetch('/chatai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_input: text
+                    })
+                });
 
-                    const data = await res.json();
+                const data = await res.json();
 
                 // Remove typing indicator
-                    if (typingElement) {
-                        typingElement.remove();
-                    }
-
-                    if (!res.ok) {
-                        addMessage('AI', 'Sorry, I encountered an error. Please try again.');
-                        return;
-                    }
-
-                    addMessage('AI', data.reply || 'I didn\'t receive a response. Please try again.');
-                } catch (err) {
-                    if (typingElement) {
-                        typingElement.remove();
-                    }
-                    addMessage('AI', 'Network error. Please check your connection and try again.');
+                if (typingElement) {
+                    typingElement.remove();
                 }
+
+                if (!res.ok) {
+                    addMessage('AI', 'Sorry, I encountered an error. Please try again.');
+                    return;
+                }
+
+                addMessage('AI', data.reply || 'I didn\'t receive a response. Please try again.');
+            } catch (err) {
+                if (typingElement) {
+                    typingElement.remove();
+                }
+                addMessage('AI', 'Network error. Please check your connection and try again.');
             }
+        }
 
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const userText = input.value.trim();
-                if (!userText) return;
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const userText = input.value.trim();
+            if (!userText) return;
 
-                addMessage('You', userText);
-                input.value = '';
+            addMessage('You', userText);
+            input.value = '';
 
             // Show typing indicator
-                const typingElement = addMessage('AI', '', true);
+            const typingElement = addMessage('AI', '', true);
 
-                sendToBackend(userText, typingElement);
-            });
+            sendToBackend(userText, typingElement);
+        });
 
         // Enter sends message
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    form.requestSubmit();
-                }
-            });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                form.requestSubmit();
+            }
+        });
 
         // Focus input on load
-            input.focus();
-        })();
-    </script>
+        input.focus();
+    })();
+</script>
 {% endblock %}
