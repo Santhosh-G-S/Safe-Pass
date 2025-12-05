@@ -1,4 +1,4 @@
-# app.py
+#app.py
 import os
 from flask import Flask, flash, redirect, render_template, url_for, jsonify, request, session
 from datetime import datetime
@@ -8,56 +8,35 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
-from google.cloud.firestore_v1.base_query import FieldFilter
 
-# Load environment variables (for local development)
 load_dotenv()
 
-# Initialize Firebase
 try:
-    # Try to get credentials from environment or file
-    if os.getenv('FIREBASE_CREDENTIALS'):
-        # For Cloud Run: credentials from environment variable
-        import json
-        cred_dict = json.loads(os.getenv('FIREBASE_CREDENTIALS'))
-        cred = credentials.Certificate(cred_dict)
-    else:
-        # For local: credentials from file
-        FIREBASE_CERT = os.getenv('FIREBASE_SERVICE_ACCOUNT', 'serviceAccountKey.json')
-        cred = credentials.Certificate(FIREBASE_CERT)
-
+    FIREBASE_CERT = os.getenv('FIREBASE_SERVICE_ACCOUNT', 'serviceAccountKey.json')
+    cred = credentials.Certificate(FIREBASE_CERT)
     firebase_admin.initialize_app(cred)
-    print("✅ Firebase initialized successfully")
 except Exception as e:
-    print(f"❌ Firebase initialization error: {e}")
+    print(f"Firebase initialization error: {e}")
 
 # Initialize Firestore
 db = firestore.client()
 
-# Get API keys from environment
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 MY_API_KEY = os.getenv("API_KEY")
-
+FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
+FIREBASE_AUTH_DOMAIN = os.getenv("FIREBASE_AUTH_DOMAIN", "safe-pass-c9c13.firebaseapp.com")
+FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "safe-pass-c9c13")
 if not MY_API_KEY:
-    print("⚠️  WARNING: API_KEY not found in environment variables")
-else:
-    genai.configure(api_key=MY_API_KEY)
-    model = genai.GenerativeModel('gemini-2.0-flash')
+    raise ValueError("API_KEY not found. Make sure it's set in your .env file.")
+genai.configure(api_key=MY_API_KEY)
+model = genai.GenerativeModel('gemini-2.0-flash')
 
-# Initialize Flask app
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
-# Generate secure secret key
-app.secret_key = os.getenv('SECRET_KEY')
-if not app.secret_key:
-    raise ValueError("SECRET_KEY environment variable must be set")
-
-# Configure session to use filesystem (with cachelib)
 app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "null"
-app.config["SESSION_FILE_DIR"] = os.path.join(os.getcwd(), "flask_session")
+app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
 
 @app.after_request
 def after_request(response):
@@ -68,30 +47,17 @@ def after_request(response):
     return response
 
 # ============= FIRESTORE HELPER FUNCTIONS =============
-@app.route('/firebase-config')
-def firebase_config():
-    return jsonify({
-        'apiKey': os.getenv('FIREBASE_API_KEY'),
-        'authDomain': os.getenv('FIREBASE_AUTH_DOMAIN'),
-        'projectId': os.getenv('FIREBASE_PROJECT_ID'),
-        'storageBucket': os.getenv('FIREBASE_STORAGE_BUCKET'),
-        'messagingSenderId': os.getenv('FIREBASE_MESSAGING_SENDER_ID'),
-        'appId': os.getenv('FIREBASE_APP_ID'),
-        'measurementId': os.getenv('FIREBASE_MEASUREMENT_ID')
-    })
-
 
 def get_user_by_email(email):
     """Get user document by email"""
     users_ref = db.collection('users')
-    query = users_ref.where(filter=FieldFilter('email', '==', email)).limit(1).stream()
+    query = users_ref.where(filter=firestore.FieldFilter('email', '==', email)).limit(1).stream()
 
     for doc in query:
         user_data = doc.to_dict()
         user_data['id'] = doc.id
         return user_data
     return None
-
 
 def get_user_by_id(user_id):
     """Get user document by ID"""
@@ -102,7 +68,6 @@ def get_user_by_id(user_id):
         return user_data
     return None
 
-
 def create_user(email, password_hash):
     """Create new user in Firestore"""
     doc_ref = db.collection('users').add({
@@ -111,7 +76,6 @@ def create_user(email, password_hash):
         'created_at': firestore.SERVER_TIMESTAMP
     })
     return doc_ref[1].id
-
 
 def create_report(user_id, latitude, longitude, description, date, time, address, incident_type):
     """Create new report in Firestore"""
@@ -128,11 +92,9 @@ def create_report(user_id, latitude, longitude, description, date, time, address
     })
     return doc_ref[1].id
 
-
 def get_all_reports():
     """Get all reports from Firestore"""
-    reports_ref = db.collection('reports').order_by(
-        'created_at', direction=firestore.Query.DESCENDING)
+    reports_ref = db.collection('reports').order_by('created_at', direction=firestore.Query.DESCENDING)
     reports = reports_ref.stream()
 
     result = []
@@ -148,12 +110,10 @@ def get_all_reports():
 
     return result
 
-
 def get_reports_by_user(user_id):
     """Get reports for specific user"""
     reports_ref = db.collection('reports')
-    query = reports_ref.where(filter=FieldFilter('user_id', '==', user_id)).order_by(
-        'created_at', direction=firestore.Query.DESCENDING)
+    query = reports_ref.where(filter=firestore.FieldFilter('user_id', '==', user_id))
     reports = query.stream()
 
     result = []
@@ -167,10 +127,12 @@ def get_reports_by_user(user_id):
 
         result.append(report_data)
 
+    # Sort in Python instead of Firestore
+    result.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+
     return result
 
 # ============= ROUTES =============
-
 
 @app.route("/")
 def index():
@@ -178,14 +140,7 @@ def index():
         return redirect("/check")
     return redirect("/login")
 
-
-@app.route("/health")
-def health():
-    """Health check endpoint for Cloud Run"""
-    return jsonify({"status": "healthy", "service": "safe-pass"}), 200
-
-
-@app.route("/login", methods=["POST", "GET"])
+@app.route("/login", methods=["POST","GET"])
 def login():
     session.clear()
     if request.method == "POST":
@@ -193,29 +148,28 @@ def login():
         password = request.form.get("password")
 
         if not (email and password):
-            flash("Please Enter valid email address and password", "warning")
+            flash("Please Enter valid email address and password","warning")
             return redirect(url_for('login'))
 
         user = get_user_by_email(email)
 
         if not user or not check_password_hash(user["hash"], password):
-            flash("invalid email and/or password", "warning")
+            flash("invalid email and/or password","warning")
             return redirect(url_for('login'))
 
         session["user_id"] = user["id"]
         return redirect("/check")
 
     else:
-        return render_template("login.html")
+        return render_template("login.html", firebase_api_key=FIREBASE_API_KEY, firebase_auth_domain=FIREBASE_AUTH_DOMAIN, firebase_project_id=FIREBASE_PROJECT_ID)
 
-
-@app.route("/report", methods=["POST", "GET"])
+@app.route("/report",methods=["POST","GET"])
 def report():
     if "user_id" not in session:
         return redirect("/login")
 
     if request.method == "GET":
-        return render_template("report.html", google_maps_key=GOOGLE_MAPS_API_KEY)
+        return render_template("report.html", google_maps_key = GOOGLE_MAPS_API_KEY)
 
     else:
         lat = request.form.get('latitude')
@@ -258,11 +212,8 @@ def check():
     return render_template("check.html", row=rows, google_maps_key=GOOGLE_MAPS_API_KEY)
 
 
-@app.route("/chatai", methods=["POST", "GET"])
+@app.route("/chatai",methods=["POST","GET"])
 def chatai():
-    if "user_id" not in session:
-        return redirect("/login")
-
     if request.method == "GET":
         return render_template("chatai.html")
 
@@ -273,8 +224,45 @@ def chatai():
         if not user_prompt:
             return jsonify({"error": "Empty prompt"}), 400
 
-        system_prompt = "You are a Safety & Travel Advisory Assistant for a community safety platform. Your role is to help users stay safe while traveling and report incidents,YOUR RESPONSIBILITIES: Guide travelers about safety in their destination areas, Help users report incidents (theft, harassment, accidents, etc.) with proper details, Provide safety recommendations based on location and time, Ask relevant follow-up questions to gather incident details, Offer immediate safety advice when users report active threats, Just provide any emergency contacts for womens helpline in india, Don't ask any other information to user"
-        full_prompt = f"""{system_prompt} User: {user_prompt}"""
+        system_prompt = """You are a Safety & Travel Advisory Assistant for Safe Pass, a community safety platform.
+
+CORE RESPONSIBILITIES:
+- Provide location-specific safety advice based on the user's situation
+- Help assess safety risks for specific areas, times, and circumstances
+- Offer practical safety recommendations for travelers
+- Guide users on reporting incidents when needed
+- Provide emergency contacts ONLY when there's an active safety concern
+
+RESPONSE GUIDELINES:
+1. ANALYZE THE CONTEXT: Consider location, time, and user's situation
+2. BE SPECIFIC: Give actionable advice relevant to their exact query
+3. BE CONVERSATIONAL: Sound helpful and supportive, not robotic
+4. PRIORITIZE SAFETY: If you detect potential danger, emphasize immediate safety steps
+
+EXAMPLES:
+- If user mentions late night travel → Advise on safe transport options, well-lit areas, staying alert
+- If user asks about area safety → Provide insights about that specific location if known
+- If user reports active threat → Immediately provide emergency contacts and safety steps
+- If general question → Give practical travel safety tips
+
+EMERGENCY CONTACTS (only provide when relevant):
+- Women's Helpline: 1091, 181
+- Police: 100
+- Ambulance: 102
+
+DO NOT:
+- Give generic safety tips when specific advice is needed
+- Provide emergency numbers unless there's a safety concern
+- Ask for unnecessary personal details
+- Make assumptions about danger without context
+
+Remember: Your goal is to make users feel safer and more informed about their specific situation."""
+
+        full_prompt = f"""{system_prompt}
+
+User query: {user_prompt}
+
+Provide a helpful, contextual response:"""
         response = model.generate_content(full_prompt)
         response_text = response.text
         return jsonify({"reply": response_text})
@@ -294,12 +282,12 @@ def register():
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
 
-        if not (email and password and confirmation):
-            flash("Please fill all required fields", 'warning')
+        if not(email and password and confirmation):
+            flash("Please fill all required fields",'warning')
             return redirect(url_for("register"))
 
         elif not password == confirmation:
-            flash("rentered password mismatch", 'warning')
+            flash("rentered password mismatch",'warning')
             return redirect(url_for("register"))
 
         # Check if user already exists
@@ -308,8 +296,7 @@ def register():
             flash("Email Already Exists", 'warning')
             return redirect(url_for("register"))
 
-        hpass = generate_password_hash(request.form.get(
-            "password"), method='scrypt', salt_length=16)
+        hpass = generate_password_hash(request.form.get("password"), method='scrypt', salt_length=16)
 
         try:
             create_user(email, hpass)
@@ -320,12 +307,10 @@ def register():
 
         return redirect("/login")
 
-
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
-
 
 @app.route("/myreport")
 def myreport():
@@ -334,7 +319,6 @@ def myreport():
 
     rows = get_reports_by_user(session["user_id"])
     return render_template("check.html", row=rows, google_maps_key=GOOGLE_MAPS_API_KEY)
-
 
 @app.route("/firebase-login", methods=["POST"])
 def firebase_login():
@@ -375,16 +359,15 @@ def firebase_login():
         print(f"Firebase login error: {e}")
         return jsonify({"error": "Authentication failed"}), 500
 
-
 if __name__ == '__main__':
-    # Get port from environment (Cloud Run sets this)
-    port = int(os.environ.get('PORT', 8080))
+    is_production = os.getenv('FLASK_ENV') == 'production'
 
-    print(f"🚀 Starting Safe Pass on port {port}")
-    print(f"📍 Environment: {os.getenv('FLASK_ENV', 'development')}")
+    if is_production:
+        print("WARNING: Running Flask development server in production mode!")
+        print("Use Gunicorn instead: gunicorn app:app")
 
     app.run(
-        debug=False,
-        host='0.0.0.0',  # CRITICAL for Cloud Run
-        port=port
+        debug=not is_production,  # Debug only in development
+        host='0.0.0.0',  # Allow external connections
+        port=int(os.environ.get('PORT', 8080))
     )
