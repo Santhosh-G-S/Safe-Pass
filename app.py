@@ -365,6 +365,8 @@ def firebase_login():
     except Exception as e:
         return error_response("AUTH_FAILED", "Authentication failed", 500)
 
+
+# =Serves HTML Page to the server and data are handle by above login and register REST API Layer
 @app.route("/login", methods=["GET"])
 def login_page():
     return render_template("login.html", firebase_api_key=FIREBASE_API_KEY,
@@ -374,6 +376,26 @@ def login_page():
 @app.route("/register", methods=["GET"])
 def register_page():
     return render_template("register.html")
+
+@app.route("/report", methods=["GET"])
+def report_page():
+    if "user_id" not in session:
+        return redirect("/login")
+    return render_template("report.html", google_maps_key=GOOGLE_MAPS_API_KEY)
+
+@app.route("/check", methods=["GET"])
+def check_page():
+    if "user_id" not in session:
+        return redirect("/login")
+    return render_template("check.html", google_maps_key=GOOGLE_MAPS_API_KEY)
+
+@app.route("/myreport", methods=["GET"])
+def myreport_page():
+    if "user_id" not in session:
+        return redirect("/login")
+    return render_template("check.html", google_maps_key=GOOGLE_MAPS_API_KEY)
+
+
 
 app.register_blueprint(api_v1)
 
