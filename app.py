@@ -32,7 +32,7 @@ FIREBASE_AUTH_DOMAIN = os.getenv("FIREBASE_AUTH_DOMAIN", "safe-pass-c9c13.fireba
 FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "safe-pass-c9c13")
 if not MY_API_KEY:
     raise ValueError("API_KEY not found. Make sure it's set in your .env file.")
-genai.configure(api_key=MY_API_KEY)
+
 client = genai.Client(api_key=MY_API_KEY)
 
 app = Flask(__name__)
