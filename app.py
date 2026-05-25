@@ -418,6 +418,12 @@ def myreport_page():
         return redirect("/login")
     return render_template("check.html", google_maps_key=GOOGLE_MAPS_API_KEY)
 
+@app.route("/chatai", methods=["GET"])
+def chatai_page():
+    if "user_id" not in session:
+        return redirect("/login")
+    return render_template("chatai.html")
+
 
 
 app.register_blueprint(api_v1)
