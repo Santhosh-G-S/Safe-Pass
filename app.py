@@ -161,28 +161,27 @@ def index():
         return redirect("/check")
     return redirect("/login")
 
-@app.route("/login", methods=["POST","GET"])
+@api_v1.route("/auth/login", methods=["POST"])
 def login():
     session.clear()
-    if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
+    data = request.get_json()
 
-        if not (email and password):
-            flash("Please Enter valid email address and password","warning")
-            return redirect(url_for('login'))
+    if not data:
+        return error_response("INVALID_REQUEST", "JSON body required", 400)
 
-        user = get_user_by_email(email)
+    email = data.get("email")
+    password = data.get("password")
 
-        if not user or not check_password_hash(user["hash"], password):
-            flash("invalid email and/or password","warning")
-            return redirect(url_for('login'))
+    if not (email and password):
+        return error_response("MISSING_FIELDS", "Email and password required", 400)
 
-        session["user_id"] = user["id"]
-        return redirect("/check")
+    user = get_user_by_email(email)
 
-    else:
-        return render_template("login.html", firebase_api_key=FIREBASE_API_KEY, firebase_auth_domain=FIREBASE_AUTH_DOMAIN, firebase_project_id=FIREBASE_PROJECT_ID)
+    if not user or not check_password_hash(user["hash"], password):
+        return error_response("INVALID_CREDENTIALS", "Invalid email and/or password", 401)
+
+    session["user_id"] = user["id"]
+    return success_response({"redirect": "/check"}, "Login successful")
 
 @app.route("/report",methods=["POST","GET"])
 def report():
