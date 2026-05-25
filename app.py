@@ -22,7 +22,7 @@ except Exception as e:
 # Initialize Firestore
 db = firestore.client()
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = gemini-2.5-flash
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 MY_API_KEY = os.getenv("API_KEY")
 FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
