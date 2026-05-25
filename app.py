@@ -322,13 +322,13 @@ def logout():
     session.clear()
     return redirect("/")
 
-@app.route("/myreport")
-def myreport():
+@api_v1.route("/reports/me", methods=["GET"])
+def get_my_reports_api():
     if "user_id" not in session:
-        return redirect("/login")
+        return error_response("UNAUTHORIZED", "Login required", 401)
 
     rows = get_reports_by_user(session["user_id"])
-    return render_template("check.html", row=rows, google_maps_key=GOOGLE_MAPS_API_KEY)
+    return success_response({"reports": rows, "count": len(rows)}, "Reports fetched")
 
 @api_v1.route("/auth/firebase-login", methods=["POST"])
 def firebase_login():
