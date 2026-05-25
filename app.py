@@ -296,7 +296,7 @@ def chatai():
             Remember: Your goal is to make users feel safer and more informed about their specific situation."""
 
         full_prompt = f"""{system_prompt} User query: {user_prompt} Provide a helpful, contextual response:"""
-        response = model.generate_content(full_prompt)
+        response =  client.models.generate_content(model="gemini-2.5-flash",contents=full_prompt)
 
         return success_response({"reply": response.text}, "Chat response generated")
 
