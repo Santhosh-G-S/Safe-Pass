@@ -365,6 +365,16 @@ def firebase_login():
     except Exception as e:
         return error_response("AUTH_FAILED", "Authentication failed", 500)
 
+@app.route("/login", methods=["GET"])
+def login_page():
+    return render_template("login.html", firebase_api_key=FIREBASE_API_KEY,
+                           firebase_auth_domain=FIREBASE_AUTH_DOMAIN,
+                           firebase_project_id=FIREBASE_PROJECT_ID)
+
+@app.route("/register", methods=["GET"])
+def register_page():
+    return render_template("register.html")
+
 app.register_blueprint(api_v1)
 
 if __name__ == '__main__':
