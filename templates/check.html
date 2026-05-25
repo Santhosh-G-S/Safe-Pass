@@ -55,8 +55,33 @@ window.initMap = async function() {
   const isMyReports = window.location.pathname === '/myreport';
   const apiUrl = isMyReports ? '/api/v1/reports/me' : '/api/v1/reports';
 
-  const res = await fetch(apiUrl);
-  const json = await res.json();
+  let currentPage = 1;
+  const limit = 20;
+
+  async function loadReports(page = 1) {
+      const res = await fetch(`${apiUrl}?page=${page}&limit=${limit}`);
+      const json = await res.json();
+
+      // Add sequential report numbers
+      json.data.reports.forEach((report, index) => {
+          report.reportNumber = ((page - 1) * limit) + index + 1;
+      });
+
+      plotReports(json.data.reports);
+
+      // Update pagination controls
+      const pagination = json.data.pagination;
+      if (pagination) {
+          document.getElementById('pageInfo').textContent =
+              `Page ${pagination.page} of ${pagination.pages} (${pagination.total} reports)`;
+          document.getElementById('prevBtn').disabled = !pagination.has_prev;
+          document.getElementById('nextBtn').disabled = !pagination.has_next;
+          currentPage = pagination.page;
+      }
+  }
+
+  const reportsData = [];
+  await loadReports(1);
   const reportsData = json.data.reports;
 
   // Add sequential report numbers
