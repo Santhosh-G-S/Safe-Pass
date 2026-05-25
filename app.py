@@ -183,54 +183,45 @@ def login():
     session["user_id"] = user["id"]
     return success_response({"redirect": "/check"}, "Login successful")
 
-@app.route("/report",methods=["POST","GET"])
-def report():
+@api_v1.route("/reports", methods=["POST"])
+def create_report_api():
     if "user_id" not in session:
-        return redirect("/login")
+        return error_response("UNAUTHORIZED", "Login required", 401)
 
-    if request.method == "GET":
-        return render_template("report.html", google_maps_key = GOOGLE_MAPS_API_KEY)
+    data = request.get_json()
 
-    else:
-        lat = request.form.get('latitude')
-        lng = request.form.get('longitude')
-        address = request.form.get('address') or ''
-        incident_type = request.form.get('incident_type') or ''
-        description = request.form.get('description') or ''
-        date = request.form.get('date') or ''
-        time = request.form.get('time') or ''
+    if not data:
+        return error_response("INVALID_REQUEST", "JSON body required", 400)
 
-        if not (lat and lng and description and date and time and incident_type):
-            flash('Please fill all required fields and select a location', 'warning')
-            return redirect(url_for('report'))
+    required_fields = ['latitude', 'longitude', 'description', 'date', 'time', 'incident_type']
+    missing = [f for f in required_fields if not data.get(f)]
 
-        try:
-            create_report(
-                session["user_id"],
-                float(lat),
-                float(lng),
-                description.strip(),
-                date,
-                time,
-                address,
-                incident_type
-            )
-            flash('Report submitted successfully!', 'success')
-        except Exception as e:
-            flash(f'Error submitting report: {str(e)}', 'warning')
-            print(f"Database error: {e}")
+    if missing:
+        return error_response("MISSING_FIELDS", f"Missing: {', '.join(missing)}", 400)
 
-        return redirect(url_for('report'))
+    try:
+        report_id = create_report(
+            session["user_id"],
+            float(data['latitude']),
+            float(data['longitude']),
+            data['description'].strip(),
+            data['date'],
+            data['time'],
+            data.get('address', ''),
+            data['incident_type']
+        )
+        return success_response({"report_id": report_id}, "Report created successfully", 201)
+    except Exception as e:
+        return error_response("CREATE_FAILED", str(e), 500)
 
 
-@app.route("/check")
-def check():
+@api_v1.route("/reports", methods=["GET"])
+def get_reports_api():
     if "user_id" not in session:
-        return redirect("/login")
+        return error_response("UNAUTHORIZED", "Login required", 401)
 
     rows = get_all_reports()
-    return render_template("check.html", row=rows, google_maps_key=GOOGLE_MAPS_API_KEY)
-
+    return success_response({"reports": rows, "count": len(rows)}, "Reports fetched")
 
 @api_v1.route("/chat", methods=["POST"])
 def chatai():
