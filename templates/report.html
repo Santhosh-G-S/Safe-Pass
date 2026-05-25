@@ -277,14 +277,43 @@ window.initMap = async function() {
   document.getElementById('time').value = pad(now.getHours()) + ':' + pad(now.getMinutes());
 
   // Form validation
-  document.getElementById('reportForm').addEventListener('submit', function(e) {
-    if (!latInput.value || !lngInput.value) {
-      e.preventDefault();
-      alert('Please select a location on the map first!');
-      return false;
-    }
-    return true;
-  });
+  document.getElementById('reportForm').addEventListener('submit', async function(e) {
+          e.preventDefault();
+
+          if (!latInput.value || !lngInput.value) {
+              alert('Please select a location on the map first!');
+              return;
+          }
+
+          const data = {
+              latitude: latInput.value,
+              longitude: lngInput.value,
+              address: addressInput.value,
+              incident_type: document.querySelector('select[name="incident_type"]').value,
+              description: document.querySelector('textarea[name="description"]').value,
+              date: document.getElementById('date').value,
+              time: document.getElementById('time').value
+          };
+
+          try {
+              const response = await fetch('/api/v1/reports', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(data)
+              });
+
+              const result = await response.json();
+
+              if (response.ok && result.success) {
+                  alert('Report submitted successfully!');
+                  window.location.reload();
+              } else {
+                  alert(result.error.message || 'Failed to submit report');
+              }
+          } catch(err) {
+              alert('Network error. Please try again.');
+          }
+      });
 
   console.log('Map ready with AdvancedMarkerElement!');
 }
