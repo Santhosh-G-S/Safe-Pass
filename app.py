@@ -233,64 +233,61 @@ def check():
     return render_template("check.html", row=rows, google_maps_key=GOOGLE_MAPS_API_KEY)
 
 
-@app.route("/chatai",methods=["POST","GET"])
+@api_v1.route("/chat", methods=["POST"])
 def chatai():
-    if request.method == "GET":
-        return render_template("chatai.html")
-
     try:
-        data = request.get_json(silent=True) or request.form
+        data = request.get_json(silent=True)
+
+        if not data:
+            return error_response("INVALID_REQUEST", "JSON body required", 400)
+
         user_prompt = data.get("user_input", "")
 
         if not user_prompt:
-            return jsonify({"error": "Empty prompt"}), 400
+            return error_response("EMPTY_PROMPT", "user_input is required", 400)
 
         system_prompt = """You are a Safety & Travel Advisory Assistant for Safe Pass, a community safety platform.
 
-CORE RESPONSIBILITIES:
-- Provide location-specific safety advice based on the user's situation
-- Help assess safety risks for specific areas, times, and circumstances
-- Offer practical safety recommendations for travelers
-- Guide users on reporting incidents when needed
-- Provide emergency contacts ONLY when there's an active safety concern
+            CORE RESPONSIBILITIES:
+            - Provide location-specific safety advice based on the user's situation
+            - Help assess safety risks for specific areas, times, and circumstances
+            - Offer practical safety recommendations for travelers
+            - Guide users on reporting incidents when needed
+            - Provide emergency contacts ONLY when there's an active safety concern
 
-RESPONSE GUIDELINES:
-1. ANALYZE THE CONTEXT: Consider location, time, and user's situation
-2. BE SPECIFIC: Give actionable advice relevant to their exact query
-3. BE CONVERSATIONAL: Sound helpful and supportive, not robotic
-4. PRIORITIZE SAFETY: If you detect potential danger, emphasize immediate safety steps
+            RESPONSE GUIDELINES:
+            1. ANALYZE THE CONTEXT: Consider location, time, and user's situation
+            2. BE SPECIFIC: Give actionable advice relevant to their exact query
+            3. BE CONVERSATIONAL: Sound helpful and supportive, not robotic
+            4. PRIORITIZE SAFETY: If you detect potential danger, emphasize immediate safety steps
 
-EXAMPLES:
-- If user mentions late night travel → Advise on safe transport options, well-lit areas, staying alert
-- If user asks about area safety → Provide insights about that specific location if known
-- If user reports active threat → Immediately provide emergency contacts and safety steps
-- If general question → Give practical travel safety tips
+            EXAMPLES:
+            - If user mentions late night travel → Advise on safe transport options, well-lit areas, staying alert
+            - If user asks about area safety → Provide insights about that specific location if known
+            - If user reports active threat → Immediately provide emergency contacts and safety steps
+            - If general question → Give practical travel safety tips
 
-EMERGENCY CONTACTS (only provide when relevant):
-- Women's Helpline: 1091, 181
-- Police: 100
-- Ambulance: 102
+            EMERGENCY CONTACTS (only provide when relevant):
+            - Women's Helpline: 1091, 181
+            - Police: 100
+            - Ambulance: 102
 
-DO NOT:
-- Give generic safety tips when specific advice is needed
-- Provide emergency numbers unless there's a safety concern
-- Ask for unnecessary personal details
-- Make assumptions about danger without context
+            DO NOT:
+            - Give generic safety tips when specific advice is needed
+            - Provide emergency numbers unless there's a safety concern
+            - Ask for unnecessary personal details
+            - Make assumptions about danger without context
 
-Remember: Your goal is to make users feel safer and more informed about their specific situation."""
+            Remember: Your goal is to make users feel safer and more informed about their specific situation."""
 
-        full_prompt = f"""{system_prompt}
-
-User query: {user_prompt}
-
-Provide a helpful, contextual response:"""
+        full_prompt = f"""{system_prompt} User query: {user_prompt} Provide a helpful, contextual response:"""
         response = model.generate_content(full_prompt)
-        response_text = response.text
-        return jsonify({"reply": response_text})
+
+        return success_response({"reply": response.text}, "Chat response generated")
 
     except Exception as e:
         print("ChatAI error:", e)
-        return jsonify({"error": "Server error"}), 500
+        return error_response("CHAT_ERROR", "Server error", 500)
 
 
 @app.route("/register", methods=["GET", "POST"])
