@@ -176,6 +176,28 @@
                 }
             });
         }
+        
+        const loginForm = document.getElementById("login-form");
+        loginForm.addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("floatingInput").value;
+            const password = document.getElementById("floatingPassword").value;
+
+            const response = await fetch('/api/v1/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                window.location.href = data.data.redirect;
+            } else {
+                alert(data.error.message || 'Login failed');
+            }
+            });
     </script>
 </body>
 </html>
