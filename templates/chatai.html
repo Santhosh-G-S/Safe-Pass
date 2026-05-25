@@ -205,7 +205,7 @@
                     return;
                 }
 
-                addMessage('AI', data.reply || 'I didn\'t receive a response. Please try again.');
+                addMessage('AI', data.data.reply || 'I didn\'t receive a response. Please try again.');
             } catch (err) {
                 if (typingElement) {
                     typingElement.remove();
