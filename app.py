@@ -2,6 +2,7 @@
 import os
 from flask import Flask, flash, redirect, render_template, url_for, jsonify, request, session
 from datetime import datetime
+from flask import Blueprint
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from dotenv import load_dotenv
@@ -32,6 +33,7 @@ genai.configure(api_key=MY_API_KEY)
 model = genai.GenerativeModel('gemini-2.0-flash')
 
 app = Flask(__name__)
+api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')
 app.secret_key = os.urandom(24)
 
 app.config["SESSION_PERMANENT"] = False
@@ -45,6 +47,25 @@ def after_request(response):
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
+
+# ============= RESPONSE HELPERS =============
+
+def success_response(data, message="Success", status=200):
+    return jsonify({
+        "success": True,
+        "data": data,
+        "message": message
+    }), status
+
+def error_response(code, message, status=400, details=None):
+    return jsonify({
+        "success": False,
+        "error": {
+            "code": code,
+            "message": message,
+            "details": details or {}
+        }
+    }), status
 
 # ============= FIRESTORE HELPER FUNCTIONS =============
 
@@ -320,27 +341,24 @@ def myreport():
     rows = get_reports_by_user(session["user_id"])
     return render_template("check.html", row=rows, google_maps_key=GOOGLE_MAPS_API_KEY)
 
-@app.route("/firebase-login", methods=["POST"])
+@api_v1.route("/auth/firebase-login", methods=["POST"])
 def firebase_login():
-    """Handle Firebase Google Authentication"""
     try:
         data = request.get_json()
         id_token = data.get('idToken')
         if not id_token:
-            return jsonify({"error": "No token provided"}), 400
+            return error_response("NO_TOKEN", "No token provided", 400)
 
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
         email = decoded_token.get('email')
 
         if not email:
-            return jsonify({"error": "No email in token"}), 400
+            return error_response("NO_EMAIL", "No email in token", 400)
 
-        # Check if user exists
         user = get_user_by_email(email)
 
         if not user:
-            # Create new user
             user_id = create_user(email, f"firebase_{uid}")
             session["user_id"] = user_id
         else:
@@ -348,16 +366,17 @@ def firebase_login():
 
         session["email"] = email
 
-        return jsonify({
-            "success": True,
-            "redirect": "/check"
-        }), 200
+        return success_response(
+            {"redirect": "/check"},
+            "Authentication successful"
+        )
 
     except auth.InvalidIdTokenError:
-        return jsonify({"error": "Invalid token"}), 401
+        return error_response("INVALID_TOKEN", "Invalid token", 401)
     except Exception as e:
-        print(f"Firebase login error: {e}")
-        return jsonify({"error": "Authentication failed"}), 500
+        return error_response("AUTH_FAILED", "Authentication failed", 500)
+
+app.register_blueprint(api_v1)
 
 if __name__ == '__main__':
     is_production = os.getenv('FLASK_ENV') == 'production'
