@@ -22,6 +22,7 @@ except Exception as e:
 # Initialize Firestore
 db = firestore.client()
 
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 MY_API_KEY = os.getenv("API_KEY")
 FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
@@ -296,7 +297,7 @@ def chatai():
             Remember: Your goal is to make users feel safer and more informed about their specific situation."""
 
         full_prompt = f"""{system_prompt} User query: {user_prompt} Provide a helpful, contextual response:"""
-        response =  client.models.generate_content(model="gemini-2.5-flash",contents=full_prompt)
+        response = client.models.generate_content(model=GEMINI_MODEL,contents=full_prompt)
 
         return success_response({"reply": response.text}, "Chat response generated")
 
@@ -333,10 +334,12 @@ def register():
     except Exception as e:
         return error_response("REGISTER_FAILED", "Error during registration", 500)
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
+
 
 @api_v1.route("/reports/me", methods=["GET"])
 def get_my_reports_api():
@@ -345,6 +348,7 @@ def get_my_reports_api():
 
     rows = get_reports_by_user(session["user_id"])
     return success_response({"reports": rows, "count": len(rows)}, "Reports fetched")
+
 
 @api_v1.route("/auth/firebase-login", methods=["POST"])
 def firebase_login():
