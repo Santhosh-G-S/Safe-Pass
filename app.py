@@ -6,7 +6,7 @@ from flask import Blueprint
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from dotenv import load_dotenv
-import google.generativeai as genai
+from google import genai
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
 
@@ -30,7 +30,7 @@ FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "safe-pass-c9c13")
 if not MY_API_KEY:
     raise ValueError("API_KEY not found. Make sure it's set in your .env file.")
 genai.configure(api_key=MY_API_KEY)
-model = genai.GenerativeModel('gemini-2.0-flash')
+client = genai.Client(api_key=MY_API_KEY)
 
 app = Flask(__name__)
 api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')
