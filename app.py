@@ -366,7 +366,8 @@ def firebase_login():
         return error_response("AUTH_FAILED", "Authentication failed", 500)
 
 
-# =Serves HTML Page to the server and data are handle by above login and register REST API Layer
+# Serves HTML Page to the server and data are handle by above login and register REST API Layer
+# traditional server-rendered old but just to give html file not user data
 @app.route("/login", methods=["GET"])
 def login_page():
     return render_template("login.html", firebase_api_key=FIREBASE_API_KEY,
