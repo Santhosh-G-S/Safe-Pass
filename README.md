@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://github.com/Santhosh-G-S/Safe-Pass/raw/main/Images/Login.png" alt="Safe Pass Banner" width="100%"/>
+
 
 # 🛡️ Safe Pass
 
@@ -69,23 +69,20 @@
 
 ## 🏗️ Architecture & Tech Stack
 
-┌─────────────────────────────────────────────────────────┐
-│                      CLIENT BROWSER                     │
-│         HTML5 · CSS3 · Bootstrap · JavaScript           │
-│          Google Maps API · MarkerClusterer              │
-└────────────────────┬────────────────────────────────────┘
-                     │ HTTP Requests
-┌────────────────────▼────────────────────────────────────┐
-│                 FLASK BACKEND (Python)                  │
-│           RESTful API · Jinja2 · Werkzeug               │
-│                  Deployed on Cloud Run                  │
-└──────┬─────────────────────┬───────────────────────┬───┘
-       │                     │                       │
-┌──────▼──────┐   ┌──────────▼────────┐   ┌─────────▼──────┐
-│  Firestore  │   │  Firebase Auth    │   │  Gemini AI API │
-│  (Reports)  │   │  (Users/Google    │   │  (Chatbot)     │
-│             │   │   Sign-In)        │   │                │
-└─────────────┘   └───────────────────┘   └────────────────┘
+```mermaid
+graph TD
+    A[CLIENT BROWSER<br/>HTML5 · CSS3 · Bootstrap · JavaScript<br/>Google Maps API · MarkerClusterer] -->|HTTP Requests| B[FLASK BACKEND Python<br/>RESTful API · Jinja2 · Werkzeug<br/>Deployed on Cloud Run]
+    
+    B --> C[Firestore<br/>Reports]
+    B --> D[Firebase Auth<br/>Users/Google Sign-In]
+    B --> E[Gemini AI API<br/>Chatbot]
+    
+    style A fill:#4285f4,stroke:#1a73e8,color:#fff
+    style B fill:#34a853,stroke:#0f9d58,color:#fff
+    style C fill:#fbbc04,stroke:#f9ab00,color:#000
+    style D fill:#ea4335,stroke:#d93025,color:#fff
+    style E fill:#9333ea,stroke:#7c3aed,color:#fff
+```
 
 | Layer | Technology |
 |---|---|
@@ -174,12 +171,28 @@ gcloud run deploy safe-pass \
 
 ---
 
-## 📁 Project Structure
 
+<summary>📂 <b>View Project Structure</b></summary>
+
+```text
 Safe-Pass/
 ├── app.py                  # Main Flask application & routes
 ├── requirements.txt        # Python dependencies
 ├── Dockerfile              # Container configuration
+├── serviceAccountKey.json  # Firebase credentials (gitignored)
+├── .env                    # Environment variables (gitignored)
 ├── templates/              # Jinja2 HTML templates
+│   ├── index.html
+│   ├── login.html
+│   ├── check.html
+│   └── report.html
 ├── static/                 # CSS, JS, assets
+│   ├── css/
+│   ├── js/
+│   └── images/
 └── Images/                 # Screenshots for documentation
+    ├── Login.png
+    ├── Check.png
+    ├── Report.png
+    ├── Streetview.png
+    └── Ai chat.png
