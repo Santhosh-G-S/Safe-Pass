@@ -290,40 +290,33 @@ def chatai():
         return error_response("CHAT_ERROR", "Server error", 500)
 
 
-@app.route("/register", methods=["GET", "POST"])
+@api_v1.route("/auth/register", methods=["POST"])
 def register():
-    """Register user"""
-    if request.method == "GET":
-        return render_template("register.html")
-    else:
-        email = request.form.get("email")
-        password = request.form.get("password")
-        confirmation = request.form.get("confirmation")
+    data = request.get_json()
 
-        if not(email and password and confirmation):
-            flash("Please fill all required fields",'warning')
-            return redirect(url_for("register"))
+    if not data:
+        return error_response("INVALID_REQUEST", "JSON body required", 400)
 
-        elif not password == confirmation:
-            flash("rentered password mismatch",'warning')
-            return redirect(url_for("register"))
+    email = data.get("email")
+    password = data.get("password")
+    confirmation = data.get("confirmation")
 
-        # Check if user already exists
-        existing_user = get_user_by_email(email)
-        if existing_user:
-            flash("Email Already Exists", 'warning')
-            return redirect(url_for("register"))
+    if not (email and password and confirmation):
+        return error_response("MISSING_FIELDS", "Please fill all required fields", 400)
 
-        hpass = generate_password_hash(request.form.get("password"), method='scrypt', salt_length=16)
+    if password != confirmation:
+        return error_response("PASSWORD_MISMATCH", "Passwords do not match", 400)
 
-        try:
-            create_user(email, hpass)
-            flash("Registration successful! Please log in.", 'success')
-        except Exception as e:
-            flash("Error during registration.", 'danger')
-            print(f"Registration error: {e}")
+    existing_user = get_user_by_email(email)
+    if existing_user:
+        return error_response("EMAIL_EXISTS", "Email already exists", 409)
 
-        return redirect("/login")
+    try:
+        hpass = generate_password_hash(password, method='scrypt', salt_length=16)
+        create_user(email, hpass)
+        return success_response({}, "Registration successful", 201)
+    except Exception as e:
+        return error_response("REGISTER_FAILED", "Error during registration", 500)
 
 @app.route("/logout")
 def logout():
