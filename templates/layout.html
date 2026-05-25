@@ -31,17 +31,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/check' %}active{% endif %}" href="{{ url_for('check') }}">
+                        <a class="nav-link {% if request.path == '/check' %}active{% endif %}" href="{{ url_for('check_page') }}">
                             <i class="bi bi-geo-alt-fill me-1"></i>Check Reports
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/report' %}active{% endif %}" href="{{ url_for('report') }}">
+                        <a class="nav-link {% if request.path == '/report' %}active{% endif %}" href="{{ url_for('report_page') }}">
                             <i class="bi bi-file-earmark-plus-fill me-1"></i>Report Incident
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {% if request.path == '/myreport' %}active{% endif %}" href="{{ url_for('myreport') }}">
+                        <a class="nav-link {% if request.path == '/myreport' %}active{% endif %}" href="{{ url_for('myreport_page') }}">
                             <i class="bi bi-person-fill me-1"></i>My Reports
                         </a>
                     </li>
