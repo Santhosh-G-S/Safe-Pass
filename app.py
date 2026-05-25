@@ -12,17 +12,19 @@ from firebase_admin import credentials, auth, firestore
 
 load_dotenv()
 
+
 try:
     FIREBASE_CERT = os.getenv('FIREBASE_SERVICE_ACCOUNT', 'serviceAccountKey.json')
     cred = credentials.Certificate(FIREBASE_CERT)
     firebase_admin.initialize_app(cred)
+    db = firestore.client()
+    print("Firebase initialized!")
 except Exception as e:
     print(f"Firebase initialization error: {e}")
+    db = None
 
-# Initialize Firestore
-db = firestore.client()
 
-GEMINI_MODEL = gemini-2.5-flash
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 MY_API_KEY = os.getenv("API_KEY")
 FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
