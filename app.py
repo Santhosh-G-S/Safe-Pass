@@ -220,8 +220,33 @@ def get_reports_api():
     if "user_id" not in session:
         return error_response("UNAUTHORIZED", "Login required", 401)
 
-    rows = get_all_reports()
-    return success_response({"reports": rows, "count": len(rows)}, "Reports fetched")
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 20, type=int)
+    incident_type = request.args.get('incident_type')
+
+    all_reports = get_all_reports()
+
+    # Filter by incident type if provided
+    if incident_type:
+        all_reports = [r for r in all_reports if r.get('incident_type') == incident_type]
+
+    total = len(all_reports)
+    start = (page - 1) * limit
+    end = start + limit
+    paginated = all_reports[start:end]
+
+    return success_response({
+        "reports": paginated,
+        "pagination": {
+            "page": page,
+            "limit": limit,
+            "total": total,
+            "pages": (total + limit - 1) // limit,
+            "has_next": end < total,
+            "has_prev": page > 1
+        }
+    }, "Reports fetched")
+
 
 @api_v1.route("/chat", methods=["POST"])
 def chatai():
